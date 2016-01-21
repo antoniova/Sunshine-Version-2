@@ -28,7 +28,6 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
-
     static final String APPID = "f9fe58802ded38534b8a0ad6dd40b77b";
 
     public ForecastFragment() {
@@ -67,9 +66,8 @@ public class ForecastFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem){
-
-        // some other stuff will go here
         int id = menuItem.getItemId();
+        //todo: need to add logic to handle run-time permissions
         if( id == R.id.action_refresh){
             new FetchWeatherTask().execute();
             return true;
