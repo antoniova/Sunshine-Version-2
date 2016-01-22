@@ -85,13 +85,32 @@ public class ForecastFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem){
-        int id = menuItem.getItemId();
         //todo: need to add logic to handle run-time permissions
+        switch(menuItem.getItemId()){
+            case R.id.action_refresh:
+                new FetchWeatherTask().execute("94043,us");
+                return true;
+            case R.id.action_settings:
+                launchSettingsActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(menuItem);
+        }
+        /*
         if( id == R.id.action_refresh){
             new FetchWeatherTask().execute("94043,us");
             return true;
         }
         return  super.onOptionsItemSelected(menuItem);
+        */
+    }
+
+    /**
+     * Launches the settings/preferences activity
+     */
+    private void launchSettingsActivity(){
+        Intent intent = new Intent(getActivity(), SettingsActivity.class);
+        startActivity(intent);
     }
 
 

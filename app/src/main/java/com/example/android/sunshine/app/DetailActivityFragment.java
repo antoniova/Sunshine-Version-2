@@ -41,7 +41,7 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater){
         // add items to the menu
-        menuInflater.inflate(R.menu.menu_detail, menu);
+        menuInflater.inflate(R.menu.detail_fragment, menu);
     }
 
     @Override
