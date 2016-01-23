@@ -90,29 +90,10 @@ public class ForecastFragment extends Fragment {
             case R.id.action_refresh:
                 new FetchWeatherTask().execute("94043,us");
                 return true;
-            case R.id.action_settings:
-                launchSettingsActivity();
-                return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
         }
-        /*
-        if( id == R.id.action_refresh){
-            new FetchWeatherTask().execute("94043,us");
-            return true;
-        }
-        return  super.onOptionsItemSelected(menuItem);
-        */
     }
-
-    /**
-     * Launches the settings/preferences activity
-     */
-    private void launchSettingsActivity(){
-        Intent intent = new Intent(getActivity(), SettingsActivity.class);
-        startActivity(intent);
-    }
-
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]>{
 
