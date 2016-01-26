@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         //int id = item.getItemId();
         switch (item.getItemId()){
             case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                startActivity(new Intent(this, SettingsActivitySecond.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
