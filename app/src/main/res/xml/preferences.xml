@@ -11,6 +11,15 @@
         android:singleLine="true" />
 
     <ListPreference
+        android:title=""
+        android:defaultValue=""
+        android:entries=""
+        android:entryValues=""
+        android:key=""
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+
+    <ListPreference
         android:title="@string/pref_units_title"
         android:defaultValue="@string/pref_units_default"
         android:entries="@array/pref_units_titles"
