@@ -1,6 +1,7 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -43,7 +44,16 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.container, new ForecastFragment())
                     .commit();
         }
+
+        // Let's set the default settings once
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        // TODO: it would be nice to display a message the first time the app
+        // is launched asking the user to set their settings preferences.
+        // toast or snackbar
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

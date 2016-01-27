@@ -93,12 +93,14 @@ public class SettingsActivitySecond extends AppCompatActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            /*
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
-            */
-            bindPreferenceSummaryToValue(findPreference("pref_location"));
-            bindPreferenceSummaryToValue(findPreference("pref_units"));
+
+            // Set key strings and use them to find their corresponding preferences
+            String location_key = getString(R.string.pref_location_key);
+            String units_key = getString(R.string.pref_units_key);
+            String country_key = getString(R.string.pref_country_key);
+            bindPreferenceSummaryToValue(findPreference(location_key));
+            bindPreferenceSummaryToValue(findPreference(units_key));
+            bindPreferenceSummaryToValue(findPreference(country_key));
         }
 
         @Override

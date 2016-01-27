@@ -11,11 +11,11 @@
         android:singleLine="true" />
 
     <ListPreference
-        android:title=""
-        android:defaultValue=""
-        android:entries=""
-        android:entryValues=""
-        android:key=""
+        android:title="@string/pref_country_title"
+        android:defaultValue="@string/pref_country_default"
+        android:entries="@array/pref_country_entries"
+        android:entryValues="@array/pref_country_entry_values"
+        android:key="@string/pref_country_key"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null" />
 

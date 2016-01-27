@@ -1,9 +1,12 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -40,6 +43,9 @@ import java.util.List;
 public class ForecastFragment extends Fragment {
 
     static final String APPID = "f9fe58802ded38534b8a0ad6dd40b77b";
+    static final int FORECAST_LENGTH = 7;
+    private Uri mGeoLocation = null;
+
     private ArrayAdapter<String> mForecastAdapter;
 
     public ForecastFragment() {
@@ -57,12 +63,14 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        List<String> data = new ArrayList<>();
+        //List<String> data = new ArrayList<>();
 
-        for( int i = 0 ; i < 7; i++)
-            data.add("Today - " + Integer.toString(i) + " - 88/63");
+        //for( int i = 0 ; i < 7; i++)
+          //  data.add("Today - " + Integer.toString(i) + " - 88/63");
 
-        mForecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, data );
+        mForecastAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.list_item_forecast, R.id.list_item_forecast_textview,
+                new ArrayList<String>() );
         ListView mListview = (ListView) rootView.findViewById(R.id.listview_forecast);
         mListview.setAdapter(mForecastAdapter);
         mListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -88,19 +96,36 @@ public class ForecastFragment extends Fragment {
         //todo: need to add logic to handle run-time permissions
         switch(menuItem.getItemId()){
             case R.id.action_refresh:
-                new FetchWeatherTask().execute("94043,us");
+                updateWeather();
                 return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
         }
     }
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, String[]>{
+    @Override
+    public void onStart(){
+        super.onStart();
+        updateWeather();
+    }
+
+    public void updateWeather(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        StringBuilder locationQuery = new StringBuilder();
+        locationQuery.append(sharedPref.getString(getString(R.string.pref_location_key), ""))
+                .append(",")
+                .append(sharedPref.getString(getString(R.string.pref_country_key), ""));
+        //String unitsFormat = sharedPref.getString(getString(R.string.pref_units_key), "");
+        //Log.d("FORECAST_FRAGMENT", "query: " + locationQuery.toString());
+        new FetchWeatherTask().execute(locationQuery.toString());
+    }
+
+    public class FetchWeatherTask extends AsyncTask<String, Void, List<String>>{
 
         private final String  LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected List<String> doInBackground(String... params) {
 
             if( params.length == 0 ){
                 return null;
@@ -115,8 +140,8 @@ public class ForecastFragment extends Fragment {
 
             // query values to be used when building URL
             String format = "json";
-            String units = "metric";
-            int numDays = 7;
+            String units = getString(R.string.pref_units_default);
+            //int numDays = 7;
 
             try {
                 // Construct the URL for the OpenWeatherMap query
@@ -134,7 +159,7 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(QUERY_PARAM, params[0])
                         .appendQueryParameter(FORMAT_PARAM, format)
                         .appendQueryParameter(UNITS_PARAM, units)
-                        .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                        .appendQueryParameter(DAYS_PARAM, Integer.toString(FORECAST_LENGTH))
                         .appendQueryParameter(APPID_PARAM, APPID)
                         .build();
 
@@ -172,7 +197,7 @@ public class ForecastFragment extends Fragment {
                 }
                 forecastJsonStr = buffer.toString();
                 // Log.v(LOG_TAG, forecastJsonStr);
-                return getWeatherDataFromJson(forecastJsonStr, numDays);
+                return getWeatherDataFromJson(forecastJsonStr, FORECAST_LENGTH);
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
@@ -209,13 +234,20 @@ public class ForecastFragment extends Fragment {
         /**
          * Prepare the weather high/lows for presentation.
          */
-        private String formatHighLows(double high, double low) {
+        private String formatHighLows(double high, double low, String unitType) {
+            // We check which unit format the user requested. Default format
+            // is metric.
+            if(!unitType.equals(getString(R.string.pref_units_default))){
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            }
+
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
-
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
+            //String highLowStr = roundedHigh + "/" + roundedLow;
+            //return highLowStr;
+            return roundedHigh + "/" + roundedLow;
         }
 
         /**
@@ -225,7 +257,7 @@ public class ForecastFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+        private List<String> getWeatherDataFromJson(String forecastJsonStr, int numDays)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -256,7 +288,13 @@ public class ForecastFragment extends Fragment {
             // now we work exclusively in UTC
             dayTime = new Time();
 
-            String[] resultStrs = new String[numDays];
+            SharedPreferences sharedPrefs =
+                    PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = sharedPrefs.getString(
+                    getString(R.string.pref_units_key),
+                    getString(R.string.pref_units_default));
+
+            List<String> resultStrs = new ArrayList<>();
             for(int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
                 String day;
@@ -284,23 +322,41 @@ public class ForecastFragment extends Fragment {
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
 
-                highAndLow = formatHighLows(high, low);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
+                highAndLow = formatHighLows(high, low, unitType);
+                //resultStrs[i] = day + " - " + description + " - " + highAndLow;
+                resultStrs.add(day + " - " + description + " - " + highAndLow);
             }
+            // let's extract the geolocation data and append it to the String array
+            // to be returned
+            String geoLocation = "geo:";
+            geoLocation += forecastJson.getJSONObject("city")
+                    .getJSONObject("coord").getString("lon");
+            geoLocation += ",";
+            geoLocation += forecastJson.getJSONObject("city")
+                    .getJSONObject("coord").getString("lat");
+            resultStrs.add(geoLocation);
             return resultStrs;
         }
 
         /**
          * Invoked after doInBackground() returns. This method runs in the UI thread
-         * @param resultStrs
+         * @param resultStrs The daily forecast data to be posted on the main UI thread
          */
         @Override
-        protected void onPostExecute(String[] resultStrs){
+        protected void onPostExecute(List<String> resultStrs){
+            // Let's populate the listview with real weather data.
+            // Do not add the last element in the array to the listview as it
+            // contains the geolocation data.
+            int lastIndex = resultStrs.size() - 1 ;
+            mGeoLocation = Uri.parse(resultStrs.get(lastIndex));
+            resultStrs.remove(lastIndex);
             mForecastAdapter.clear();
-            for(String s : resultStrs){
-                mForecastAdapter.add(s);
+            for(String str : resultStrs){
+                mForecastAdapter.add(str);
             }
             mForecastAdapter.notifyDataSetChanged();
+
+            Log.d(LOG_TAG, mGeoLocation.toString());
         }
 
     }

@@ -66,14 +66,14 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <!-- Location preference values -->
-    <string name="pref_location_key" translatable="false">location</string>
-    <string name="pref_location_title" translatable="false">Location</string>
-    <string name="pref_location_default" translatable="false">92507,us</string>
+    <!-- Location settings values -->
+    <string name="pref_location_key" translatable="false">location_key</string>
+    <string name="pref_location_title" translatable="false">Location (postal code)</string>
+    <string name="pref_location_default" translatable="false">92507</string>
 
-    <!-- Units preferences values -->
+    <!-- Units settings values -->
     <string name="pref_units_key" translatable="false">units_format</string>
-    <string name="pref_units_title" translatable="false">Units</string>
+    <string name="pref_units_title" translatable="false">Temperature Units</string>
     <string name="pref_units_default" translatable="false">metric</string>
     <string-array name="pref_units_titles">
         <item>Metric</item>
@@ -87,7 +87,7 @@
     <!-- Country settings values -->
     <string name="pref_country_key" translatable="false">country_key</string>
     <string name="pref_country_title" translatable="false">Country</string>
-    <string name="pref_country_default" translatable="false"></string>
+    <string name="pref_country_default" translatable="false">us</string>
     <string-array name="pref_country_entries">
         <item>United States</item>
         <item>Canada</item>
@@ -96,7 +96,17 @@
         <item>Germany</item>
         <item>United Kingdom</item>
         <item>Japan</item>
-        <item>South Korea</item>
     </string-array>
+
+    <string-array name="pref_country_entry_values">
+        <item>us</item>
+        <item>ca</item>
+        <item>mx</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>gb</item>
+        <item>jp</item>
+    </string-array>
+
 
 </resources>
